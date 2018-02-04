@@ -14,20 +14,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.android.shops.room.entities.Brand;
-import de.wackernagel.android.shops.ui.Listable;
-import de.wackernagel.android.shops.ui.ListableAdapter;
-import de.wackernagel.android.shops.ui.ListableClickListener;
-import de.wackernagel.android.shops.ui.ListableViewHolderFactory;
-import de.wackernagel.android.shops.ui.PortraitViewTypeResolver;
+import de.wackernagel.android.shops.ui.adapter.ArrayAdapter;
 import de.wackernagel.android.shops.viewmodels.BrandViewModel;
 
 public class BrandsListFragment extends Fragment {
@@ -65,17 +59,7 @@ public class BrandsListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         ((AppCompatActivity) getActivity() ).setSupportActionBar( toolbar );
 
-        final ListableAdapter<ListableClickListener> adapter = new ListableAdapter<>(
-                new PortraitViewTypeResolver(),
-                new ListableViewHolderFactory(),
-                new ListableClickListener() {
-                    @Override
-                    public void onBrandClicked(Brand brand, View view) {
-                        Toast.makeText( view.getContext(), brand.toString(), Toast.LENGTH_SHORT ).show();
-                    }
-                }
-        );
-
+        final ArrayAdapter adapter = new ArrayAdapter();
         recyclerView.setLayoutManager( new LinearLayoutManager( getContext() ) );
         recyclerView.setHasFixedSize( true );
         recyclerView.setAdapter( adapter );
@@ -84,11 +68,7 @@ public class BrandsListFragment extends Fragment {
         viewModel.getAllBrands().observe(this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brands) {
-                final List<Listable> items = new ArrayList<>( brands != null ? brands.size() : 0 );
-                if( brands != null ) {
-                    items.addAll(brands);
-                }
-                adapter.setItems( items );
+                adapter.setItems( brands.toArray() );
             }
         });
 

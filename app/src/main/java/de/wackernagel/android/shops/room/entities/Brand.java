@@ -7,16 +7,12 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
-import android.widget.ListAdapter;
 
 import java.util.Date;
 
-import de.wackernagel.android.shops.ui.Listable;
-import de.wackernagel.android.shops.ui.ViewTypeResolver;
-
 @Entity( tableName = "brands",
          indices = { @Index( value = { "name" }, unique = true ) } )
-public class Brand implements Listable {
+public class Brand {
 
     @PrimaryKey( autoGenerate = true)
     private long id;
@@ -83,10 +79,5 @@ public class Brand implements Listable {
     @Override
     public String toString() {
         return "Brand [" + id + ", " + name + ", " + websiteUrl + ", " + imageUrl + "]";
-    }
-
-    @Override
-    public int getViewType(ViewTypeResolver resolver) {
-        return resolver.getViewType( this );
     }
 }
