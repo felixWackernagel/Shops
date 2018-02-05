@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         switch (item.getItemId()) {
             case R.id.action_brands:
             case R.id.action_shops:
+            case R.id.action_nearby:
                 getSupportFragmentManager().beginTransaction()
                         .replace( R.id.container, BrandsListFragment.newInstance(), "brands" )
                         .commit();

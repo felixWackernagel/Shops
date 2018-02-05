@@ -28,7 +28,7 @@ public class BrandsListFragment extends Fragment {
 
     public static BrandsListFragment newInstance() {
         final BrandsListFragment fragment = new BrandsListFragment();
-        fragment.setArguments(new Bundle());
+        fragment.setArguments(Bundle.EMPTY);
         return fragment;
     }
 
@@ -56,10 +56,13 @@ public class BrandsListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         AndroidSupportInjection.inject( this );
+
         super.onActivityCreated(savedInstanceState);
+
         ((AppCompatActivity) getActivity() ).setSupportActionBar( toolbar );
 
         final ArrayAdapter adapter = new ArrayAdapter();
+
         recyclerView.setLayoutManager( new LinearLayoutManager( getContext() ) );
         recyclerView.setHasFixedSize( true );
         recyclerView.setAdapter( adapter );
@@ -68,7 +71,9 @@ public class BrandsListFragment extends Fragment {
         viewModel.getAllBrands().observe(this, new Observer<List<Brand>>() {
             @Override
             public void onChanged(@Nullable List<Brand> brands) {
-                adapter.setItems( brands.toArray() );
+                if( brands != null ) {
+                    adapter.setItems(brands.toArray());
+                }
             }
         });
 

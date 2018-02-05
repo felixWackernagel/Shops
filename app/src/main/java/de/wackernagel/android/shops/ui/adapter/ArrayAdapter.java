@@ -1,12 +1,12 @@
 package de.wackernagel.android.shops.ui.adapter;
 
+import android.content.Context;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import de.wackernagel.android.shops.R;
-import de.wackernagel.android.shops.room.entities.Brand;
 
 public class ArrayAdapter extends RecyclerView.Adapter<ArrayAdapter.BindingViewHolder<?>> {
 
@@ -15,22 +15,17 @@ public class ArrayAdapter extends RecyclerView.Adapter<ArrayAdapter.BindingViewH
 
     public ArrayAdapter() {
         creators = new ViewHolderCreator[] {
-            new ViewHolderCreator<Brand, BrandViewHolder>( Brand.class, R.layout.list_item_brand ) {
-                @Override
-                BrandViewHolder createViewHolderFor(View itemView ) {
-                    return new BrandViewHolder( itemView );
-                }
-            }
+                BrandViewHolder.LIST_CREATOR
         };
     }
 
     @Override
     public int getItemViewType( int position ) {
+        // Search for a ViewHolderCreator which supports the item type and get his layout resource id.
         for( int index = 0; index < creators.length; index++ ) {
-            final Object item = items[position];
             final ViewHolderCreator<?, ?> viewHolderCreator = creators[index];
-            if( viewHolderCreator.supportsItem( item ) ) {
-                return viewHolderCreator.getViewType();
+            if( viewHolderCreator.supportsItem( items[position] ) ) {
+                return viewHolderCreator.getLayoutResId();
             }
         }
         return super.getItemViewType(position);
@@ -38,6 +33,7 @@ public class ArrayAdapter extends RecyclerView.Adapter<ArrayAdapter.BindingViewH
 
     @Override
     public BindingViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // Search for a ViewHolderCreator which supports the viewType and create a concrete ViewHolder
         for( int index = 0; index < creators.length; index++ ) {
             final ViewHolderCreator<?, ?> viewHolderCreator = creators[index];
             if( viewHolderCreator.supportsViewType( viewType ) ) {
@@ -59,55 +55,77 @@ public class ArrayAdapter extends RecyclerView.Adapter<ArrayAdapter.BindingViewH
 
     public void setItems(Object[] items) {
         this.items = items;
+        notifyDataSetChanged();
     }
 
+    /**
+     * A creator of ViewHolders based on a concrete item class and layout resource.
+     *
+     * @param <ITEM> type of the supported item
+     * @param <VH> type of the ViewHolder which is created
+     */
     static abstract class ViewHolderCreator<ITEM, VH extends BindingViewHolder<ITEM>> {
 
         private final Class<ITEM> supportedType;
-        private final int viewId;
+        private final @LayoutRes int layoutResId;
 
-        ViewHolderCreator(Class<ITEM> supportedType, int viewId ) {
+        private LayoutInflater layoutInflater;
+
+        ViewHolderCreator( @NonNull final Class<ITEM> supportedType, @LayoutRes final int layoutResId ) {
             this.supportedType = supportedType;
-            this.viewId = viewId;
+            this.layoutResId = layoutResId;
         }
 
         boolean supportsItem( Object item ) {
             return supportedType.isAssignableFrom( item.getClass() );
         }
 
-        boolean supportsViewType( int viewType ) {
-            return viewType == viewId;
+        boolean supportsViewType( final int viewType ) {
+            return viewType == layoutResId;
         }
 
-        int getViewType() {
-            return viewId;
+        @LayoutRes
+        int getLayoutResId() {
+            return layoutResId;
         }
 
-        VH createViewHolder( final ViewGroup parent ) {
-            return createViewHolderFor( LayoutInflater.from( parent.getContext() ).inflate( viewId, parent, false ) );
+        private VH createViewHolder( final ViewGroup parent ) {
+            return createViewHolderFor( getOrCreateLayoutInflater( parent.getContext() ).inflate( layoutResId, parent, false ) );
+        }
+
+        private LayoutInflater getOrCreateLayoutInflater( @NonNull final Context context ) {
+            if( layoutInflater == null ) {
+                layoutInflater = LayoutInflater.from( context );
+            }
+            return  layoutInflater;
         }
 
         abstract VH createViewHolderFor( View itemView );
     }
 
-    abstract static class BindingViewHolder<T> extends RecyclerView.ViewHolder {
+    /**
+     * A typed ViewHolder which casts a Object to the given type.
+     *
+     * @param <ITEM> type of the bind item
+     */
+    abstract static class BindingViewHolder<ITEM> extends RecyclerView.ViewHolder {
 
-        private final Class<T> supportedType;
+        private final Class<ITEM> supportedType;
 
-        BindingViewHolder(View itemView, Class<T> supportedType) {
+        BindingViewHolder(View itemView, Class<ITEM> supportedType) {
             super(itemView);
             this.supportedType = supportedType;
         }
 
         void bind( Object item ) {
             if( supportedType.isAssignableFrom( item.getClass() ) ) {
-                bindItem( (T) item );
+                bindItem( (ITEM) item );
             } else {
-                throw new IllegalArgumentException( "ViewHolder expected type " + supportedType.getName() + " but was " + item.getClass().getName() );
+                throw new IllegalArgumentException( "ViewHolder expected type '" + supportedType.getName() + "' but was '" + item.getClass().getName() + "'!" );
             }
         }
 
-        abstract void bindItem( T item );
+        abstract void bindItem( ITEM item );
     }
 
 }
