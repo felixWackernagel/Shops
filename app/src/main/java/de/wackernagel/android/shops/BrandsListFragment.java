@@ -4,16 +4,23 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -40,6 +47,8 @@ public class BrandsListFragment extends Fragment {
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
     private TextView ribbon;
+    private Button resultFilter;
+    private NestedScrollView bottomSheet;
 
     @Nullable
     @Override
@@ -54,6 +63,8 @@ public class BrandsListFragment extends Fragment {
         recyclerView = view.findViewById( R.id.recyclerView );
         fab = view.findViewById( R.id.fab );
         ribbon = view.findViewById( R.id.ribbon );
+        resultFilter = view.findViewById( R.id.resultFilter );
+        bottomSheet = view.findViewById(R.id.nestedScrollView);
     }
 
     @Override
@@ -87,6 +98,26 @@ public class BrandsListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 BrandEditorBottomSheetDialogFragment.newInstance().show( getFragmentManager(), "BrandEditor" );
+            }
+        });
+
+        resultFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final BottomSheetBehavior bsb = BottomSheetBehavior.from(bottomSheet);
+                bsb.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                    @Override
+                    public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    }
+
+                    @Override
+                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                        Log.i("FAB", "SlideOffset=" + slideOffset);
+                        fab.setScaleX( 1.0f - slideOffset );
+                        fab.setScaleY( 1.0f - slideOffset );
+                    }
+                });
+                bsb.setState( bsb.getState() == BottomSheetBehavior.STATE_EXPANDED ? BottomSheetBehavior.STATE_COLLAPSED : BottomSheetBehavior.STATE_EXPANDED );
             }
         });
     }

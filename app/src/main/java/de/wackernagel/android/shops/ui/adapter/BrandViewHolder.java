@@ -36,8 +36,7 @@ public class BrandViewHolder extends BindingViewHolder<Brand> implements View.On
     @Override
     void bindItem( final Brand brand ) {
         this.brand = brand;
-
-        Glide.with( itemView.getContext() )
+        Glide.with( itemView.getContext().getApplicationContext() )
                 .load( brand.getImageUrl() )
                 .into( image );
         name.setText( brand.getName() );
