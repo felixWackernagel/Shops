@@ -10,8 +10,8 @@ import com.bumptech.glide.Glide;
 
 import de.wackernagel.android.shops.R;
 import de.wackernagel.android.shops.room.entities.Brand;
-import de.wackernagel.android.shops.ui.adapter.ArrayAdapter.ViewHolderCreator;
-import de.wackernagel.android.shops.ui.adapter.ArrayAdapter.BindingViewHolder;
+import de.wackernagel.android.shops.ui.adapter.MultiViewAdapter.ViewHolderCreator;
+import de.wackernagel.android.shops.ui.adapter.MultiViewAdapter.BindingViewHolder;
 
 public class BrandViewHolder extends BindingViewHolder<Brand> implements View.OnClickListener {
 

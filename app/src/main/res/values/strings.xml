@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Shops</string>
     <string name="editor_action_save">Save</string>
+
+    <plurals name="item_count">
+        <item quantity="zero">No Results</item>
+        <item quantity="one">1 Result</item>
+        <item quantity="other">%d  Results</item>
+    </plurals>
 </resources>

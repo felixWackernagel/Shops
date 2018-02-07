@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.android.shops.room.entities.Brand;
-import de.wackernagel.android.shops.ui.adapter.ArrayAdapter;
+import de.wackernagel.android.shops.ui.adapter.MultiViewAdapter;
 import de.wackernagel.android.shops.viewmodels.BrandViewModel;
 
 public class BrandsListFragment extends Fragment {
@@ -38,6 +39,7 @@ public class BrandsListFragment extends Fragment {
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
+    private TextView ribbon;
 
     @Nullable
     @Override
@@ -51,6 +53,7 @@ public class BrandsListFragment extends Fragment {
         toolbar = view.findViewById( R.id.toolbar );
         recyclerView = view.findViewById( R.id.recyclerView );
         fab = view.findViewById( R.id.fab );
+        ribbon = view.findViewById( R.id.ribbon );
     }
 
     @Override
@@ -61,7 +64,7 @@ public class BrandsListFragment extends Fragment {
 
         ((AppCompatActivity) getActivity() ).setSupportActionBar( toolbar );
 
-        final ArrayAdapter adapter = new ArrayAdapter();
+        final MultiViewAdapter adapter = new MultiViewAdapter();
 
         recyclerView.setLayoutManager( new LinearLayoutManager( getContext() ) );
         recyclerView.setHasFixedSize( true );
@@ -74,6 +77,9 @@ public class BrandsListFragment extends Fragment {
                 if( brands != null ) {
                     adapter.setItems(brands.toArray());
                 }
+
+                final int count = brands != null ? brands.size() : 0;
+                ribbon.setText( getResources().getQuantityString( R.plurals.item_count, count, count ) );
             }
         });
 

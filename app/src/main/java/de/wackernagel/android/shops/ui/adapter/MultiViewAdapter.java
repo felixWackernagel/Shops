@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ArrayAdapter extends RecyclerView.Adapter<ArrayAdapter.BindingViewHolder<?>> {
+public class MultiViewAdapter extends RecyclerView.Adapter<MultiViewAdapter.BindingViewHolder<?>> {
 
     private Object[] items;
     private ViewHolderCreator<?, ?>[] creators;
 
-    public ArrayAdapter() {
+    public MultiViewAdapter() {
         creators = new ViewHolderCreator[] {
                 BrandViewHolder.LIST_CREATOR
         };
@@ -117,6 +117,7 @@ public class ArrayAdapter extends RecyclerView.Adapter<ArrayAdapter.BindingViewH
             this.supportedType = supportedType;
         }
 
+        @SuppressWarnings({"unchecked"})
         void bind( Object item ) {
             if( supportedType.isAssignableFrom( item.getClass() ) ) {
                 bindItem( (ITEM) item );
