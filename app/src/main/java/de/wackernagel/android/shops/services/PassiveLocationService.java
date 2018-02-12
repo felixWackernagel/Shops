@@ -20,13 +20,15 @@ import de.wackernagel.android.shops.R;
 public class PassiveLocationService extends Service {
     private static final String TAG = "PassiveLocationService";
     private LocationManager mLocationManager = null;
-    private static final long LOCATION_INTERVAL = 1000L;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final long LOCATION_INTERVAL_MS = 1000L * 60L; // 1 Minute
+    private static final float LOCATION_DISTANCE_M = 100f; // 100 Meter
 
     private static class LocationListener implements android.location.LocationListener {
 
         private Context context;
         private Location mLastLocation;
+
+        private int updateCount = 0;
 
         LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
@@ -48,11 +50,12 @@ public class PassiveLocationService extends Service {
             Log.e(TAG, "Last lat=" + mLastLocation.getLatitude() + ", long=" + mLastLocation.getLongitude()  );
 
             if( context != null ) {
+                updateCount++;
                 final NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder( context, "shopsChannel" )
                                 .setSmallIcon(R.drawable.ic_place_black_24dp)
                                 .setContentTitle("Shops - New Location")
-                                .setContentText("Lat=" + mLastLocation.getLatitude() + ", Long=" + mLastLocation.getLongitude());
+                                .setContentText( "(" + updateCount + ") Lat=" + mLastLocation.getLatitude() + ", Long=" + mLastLocation.getLongitude());
                 final Intent resultIntent = new Intent( context, MainActivity.class );
                 final PendingIntent resultPendingIntent =
                         PendingIntent.getActivity(
@@ -106,18 +109,24 @@ public class PassiveLocationService extends Service {
 
         initializeLocationManager();
 
-        try {
-            mLocationListener.onAttach( this );
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.PASSIVE_PROVIDER,
-                    LOCATION_INTERVAL,
-                    LOCATION_DISTANCE,
-                    mLocationListener
-            );
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+        mLocationListener.onAttach( this );
+        requestLocation(LocationManager.NETWORK_PROVIDER);
+        requestLocation(LocationManager.GPS_PROVIDER);
+    }
+
+    private void requestLocation(String provider) {
+        if( mLocationManager.isProviderEnabled( provider ) ) {
+            try {
+                mLocationManager.requestLocationUpdates(provider, LOCATION_INTERVAL_MS, LOCATION_DISTANCE_M, mLocationListener );
+                final Location lastLocation = mLocationManager.getLastKnownLocation(provider);
+                if( lastLocation != null ) {
+                    mLocationListener.onLocationChanged( lastLocation );
+                }
+            } catch (java.lang.SecurityException ex) {
+                Log.i(TAG, "fail to request location update for " + provider + ", ignore", ex);
+            } catch (IllegalArgumentException ex) {
+                Log.d(TAG, "network provider does not exist for " + provider + ", " + ex.getMessage());
+            }
         }
     }
 
@@ -136,10 +145,14 @@ public class PassiveLocationService extends Service {
                 Log.i(TAG, "fail to remove location listener, ignore", ex);
             }
         }
+        final NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if( mNotifyMgr != null ) {
+            mNotifyMgr.cancel(1);
+        }
     }
 
     private void initializeLocationManager() {
-        Log.e(TAG, "initializeLocationManager - LOCATION_INTERVAL: "+ LOCATION_INTERVAL + " LOCATION_DISTANCE: " + LOCATION_DISTANCE);
+        Log.e(TAG, "initializeLocationManager - LOCATION_INTERVAL_MS: "+ LOCATION_INTERVAL_MS + " LOCATION_DISTANCE_M: " + LOCATION_DISTANCE_M);
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }

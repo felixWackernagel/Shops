@@ -22,12 +22,11 @@
             app:statusBarScrim="?attr/colorPrimaryDark"
             app:titleEnabled="false">
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginTop="?attr/actionBarSize"
                 android:background="@color/colorAccent"
-                android:orientation="horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp">
 
@@ -35,7 +34,7 @@
                     android:id="@+id/ribbon"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
                     tools:text="4 Results"/>
 
                 <Button
@@ -44,11 +43,11 @@
                     android:layout_height="match_parent"
                     android:text="Filter"
                     android:textColor="@android:color/white"
-                    android:layout_gravity="right|center_vertical"
+                    android:layout_gravity="end|center_vertical"
                     android:theme="@style/FlatButton"
                     style="@style/Widget.AppCompat.Button.Borderless"/>
 
-            </LinearLayout>
+            </FrameLayout>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
