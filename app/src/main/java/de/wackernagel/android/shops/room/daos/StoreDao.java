@@ -10,28 +10,34 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import de.wackernagel.android.shops.room.entities.Brand;
+import de.wackernagel.android.shops.room.entities.Store;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
-public interface BrandDao {
+public interface StoreDao {
 
     @Query( "SELECT * " +
-            "FROM brands" )
-    LiveData<List<Brand>> loadAllBrands();
+            "FROM stores" )
+    LiveData<List<Store>> loadAllStores();
 
     @Query( "SELECT * " +
-            "FROM brands " +
-            "WHERE id = :brandId" )
-    LiveData<Brand> loadBrandById(long brandId );
+            "FROM stores " +
+            "WHERE id = :storeId" )
+    LiveData<Brand> loadStoreById(long storeId );
+
+    @Query( "SELECT * " +
+            "FROM stores " +
+            "WHERE brandId = :brandId" )
+    LiveData<Brand> loadStoreByBrandId(long brandId );
 
     @Insert( onConflict = REPLACE)
-    long insertBrand( Brand brand );
+    long insertStore( Store store );
 
     @Update( onConflict = REPLACE)
-    int updateBrand( Brand brand );
+    int updateStore( Store store );
 
     @Delete
-    int deleteBrand(Brand brand );
+    int deleteStore(Store store );
 
 }
